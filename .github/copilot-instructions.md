@@ -12,6 +12,17 @@ Please ensure that all code suggestions:
 
 ---
 
+### Component Structure
+- **Component Directories**: Each React component should be placed in its own directory. This ensures better organization and scalability of the project.
+- **File Naming**: The React component file should be named `{ComponentName}.component.tsx`, following a consistent and clear naming convention.
+- **Index File**: Each component folder must include an `index.ts` file. This file should re-export all relevant modules from the component, making it easier to import the component elsewhere in the project.
+- **Folder Contents**: Alongside the component, include its related files such as:
+  - **Tests**: A test file (e.g., `{ComponentName}.spec.tsx`) should be located in the same directory as the component.
+  - **Stories**: If using Storybook, a `.stories.tsx` file should also reside within the same directory.
+  - **Other Files**: Any additional files related to the component (e.g., styles, hooks, etc.) should be stored within the component's directory for better encapsulation.
+
+---
+
 ### Test Instructions
 - Use `.spec.tsx` files for all test implementations.
 - Prefer **Vitest** as the testing framework.
