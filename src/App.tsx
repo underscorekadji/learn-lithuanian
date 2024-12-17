@@ -1,24 +1,5 @@
-import { Layout, Typography, Card } from "antd";
+import { Button } from "flowbite-react";
 
-const { Content } = Layout;
-const { Title } = Typography;
-
-function App() {
-  return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Content
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Card>
-          <Title>Labas, Pasauli!</Title>
-        </Card>
-      </Content>
-    </Layout>
-  );
+export default function App() {
+  return <Button>Click me</Button>;
 }
-
-export default App;
