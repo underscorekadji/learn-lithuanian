@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
-import App from "./App";
 import { DefaultLayout } from "./layouts/DefaultLayout";
+import WordsPage from "./pages/WordsPage/WordsPage.component";
 
 const router = createBrowserRouter([
   {
@@ -9,7 +9,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <App />,
+        element: <WordsPage />,
       },
     ],
   },
