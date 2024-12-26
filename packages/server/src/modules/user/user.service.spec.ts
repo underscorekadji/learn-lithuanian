@@ -135,6 +135,94 @@ describe('UserService', () => {
     });
   });
 
+  describe('findByEmail', () => {
+    it('should return a user by email', async () => {
+      const user: User = {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as User;
+
+      jest.spyOn(repository, 'findOne').mockResolvedValue(user);
+
+      const result = await service.findByEmail('test@example.com');
+
+      expect(result).toEqual(service['mapUserToResponse'](user));
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+
+      await expect(service.findByEmail('test@example.com')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('findByUsername', () => {
+    it('should return a user by username', async () => {
+      const user: User = {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as User;
+
+      jest.spyOn(repository, 'findOne').mockResolvedValue(user);
+
+      const result = await service.findByUsername('testuser');
+
+      expect(result).toEqual(service['mapUserToResponse'](user));
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+
+      await expect(service.findByUsername('testuser')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('getPasswordHash', () => {
+    it('should return the password hash of a user', async () => {
+      const user: User = {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+        passwordHash: 'hashedPassword123',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as User;
+
+      jest.spyOn(repository, 'findOne').mockResolvedValue(user);
+
+      const result = await service.getPasswordHash(user);
+
+      expect(result).toEqual({ passwordHash: 'hashedPassword123' });
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      const user: User = {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+        passwordHash: 'hashedPassword123',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as User;
+
+      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+
+      await expect(service.getPasswordHash(user)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
   describe('update', () => {
     it('should update a user', async () => {
       const updateUserDto: UpdateUserDto = {

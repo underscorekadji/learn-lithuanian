@@ -2,10 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
-
+import { SigninDto } from './dto/signin.dto';
 describe('AuthController', () => {
-  let controller: AuthController;
-  let service: AuthService;
+  let authController: AuthController;
+  let authService: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,39 +14,60 @@ describe('AuthController', () => {
         {
           provide: AuthService,
           useValue: {
-            signup: jest.fn().mockResolvedValue({}),
+            signup: jest.fn(),
+            login: jest.fn(),
           },
         },
       ],
     }).compile();
 
-    controller = module.get<AuthController>(AuthController);
-    service = module.get<AuthService>(AuthService);
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+    authController = module.get<AuthController>(AuthController);
+    authService = module.get<AuthService>(AuthService);
   });
 
   describe('signup', () => {
     it('should call AuthService.signup with correct parameters', async () => {
       const signupDto: SignupDto = {
-        username: 'test',
-        email: 'test@mail.com',
-        password: 'test',
+        username: 'testuser',
+        email: 'testuser@test.com',
+        password: 'testpass',
       };
-      await controller.signup(signupDto);
-      expect(service.signup).toHaveBeenCalledWith(signupDto);
+      await authController.signup(signupDto);
+      expect(authService.signup).toHaveBeenCalledWith(signupDto);
     });
 
     it('should return the result of AuthService.signup', async () => {
-      const result = { id: 1, email: 'test@mail.com', username: 'test' };
-      jest.spyOn(service, 'signup').mockResolvedValueOnce(result);
+      const result = {
+        access_token: 'token',
+      };
+      jest.spyOn(authService, 'signup').mockResolvedValue(result);
       expect(
-        await controller.signup({
-          username: 'test',
-          email: 'test@mail.com',
-          password: 'test',
+        await authController.signup({
+          username: 'testuser',
+          email: 'testuser@test.com',
+          password: 'testpass',
+        }),
+      ).toBe(result);
+    });
+  });
+
+  describe('signin', () => {
+    it('should call AuthService.login with correct parameters', async () => {
+      const signinDto: SigninDto = {
+        username: 'testuser',
+        password: 'testpass',
+      };
+      await authController.signin(signinDto);
+      expect(authService.login).toHaveBeenCalledWith(signinDto);
+    });
+
+    it('should return the result of AuthService.login', async () => {
+      const result = { access_token: 'token' };
+      jest.spyOn(authService, 'login').mockResolvedValue(result);
+      expect(
+        await authController.signin({
+          username: 'testuser',
+          password: 'testpass',
         }),
       ).toBe(result);
     });

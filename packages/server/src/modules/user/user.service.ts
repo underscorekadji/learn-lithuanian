@@ -49,10 +49,53 @@ export class UserService {
       where: { id },
       select: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
     });
+
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
+
     return this.mapUserToResponse(user);
+  }
+
+  async findByEmail(email: string): Promise<Partial<User>> {
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+
+    return this.mapUserToResponse(user);
+  }
+
+  async findByUsername(username: string): Promise<Partial<User>> {
+    const user = await this.userRepository.findOne({
+      where: { username },
+      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with username ${username} not found`);
+    }
+
+    return this.mapUserToResponse(user);
+  }
+
+  async getPasswordHash(user: {
+    id: number;
+  }): Promise<{ passwordHash: string }> {
+    const userWithPassword = await this.userRepository.findOne({
+      where: { id: user.id },
+      select: ['passwordHash'],
+    });
+
+    if (!userWithPassword) {
+      throw new NotFoundException(`User with id ${user.id} not found`);
+    }
+
+    return { passwordHash: userWithPassword.passwordHash };
   }
 
   async update(
