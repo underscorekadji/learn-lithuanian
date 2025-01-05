@@ -58,7 +58,7 @@ describe('AuthService', () => {
         username: user.username,
         sub: user.id,
       });
-      expect(result).toEqual({ access_token: token });
+      expect(result).toEqual({ token: token });
     });
   });
 
@@ -93,7 +93,7 @@ describe('AuthService', () => {
         username: user.username,
         sub: user.id,
       });
-      expect(result).toEqual({ access_token: token });
+      expect(result).toEqual({ token: token });
     });
 
     it('should throw UnauthorizedException if user is not found', async () => {

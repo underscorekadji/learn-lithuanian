@@ -2,6 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 describe('UserController', () => {
   let userController: UserController;
@@ -11,6 +18,8 @@ describe('UserController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
+        ConfigService,
+        JwtService,
         {
           provide: UserService,
           useValue: {
@@ -20,6 +29,14 @@ describe('UserController', () => {
             update: jest.fn(),
             remove: jest.fn(),
           },
+        },
+        {
+          provide: APP_GUARD,
+          useClass: JwtAuthGuard,
+        },
+        {
+          provide: getRepositoryToken(User),
+          useClass: Repository,
         },
       ],
     }).compile();
@@ -69,7 +86,7 @@ describe('UserController', () => {
 
   describe('update', () => {
     it('should update a user', async () => {
-      const updateUserDto = { name: 'Jane Doe' };
+      const updateUserDto = { username: 'Jane Doe' };
       const result = { id: 1, ...updateUserDto };
       jest.spyOn(userService, 'update').mockResolvedValue(result);
 

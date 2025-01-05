@@ -3,6 +3,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { SigninDto } from './dto/signin.dto';
+import { ConfigService } from '@nestjs/config';
+
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
@@ -18,6 +20,12 @@ describe('AuthController', () => {
             login: jest.fn(),
           },
         },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('development'),
+          },
+        },
       ],
     }).compile();
 
@@ -25,51 +33,63 @@ describe('AuthController', () => {
     authService = module.get<AuthService>(AuthService);
   });
 
-  describe('signup', () => {
-    it('should call AuthService.signup with correct parameters', async () => {
-      const signupDto: SignupDto = {
-        username: 'testuser',
-        email: 'testuser@test.com',
-        password: 'testpass',
-      };
-      await authController.signup(signupDto);
-      expect(authService.signup).toHaveBeenCalledWith(signupDto);
-    });
+  it('should be defined', () => {
+    expect(authController).toBeDefined();
+  });
 
-    it('should return the result of AuthService.signup', async () => {
-      const result = {
-        access_token: 'token',
+  describe('signup', () => {
+    it('should signup a user and set a cookie', async () => {
+      const signupDto: SignupDto = {
+        username: 'test',
+        email: 'test@mail.com',
+        password: 'test',
       };
-      jest.spyOn(authService, 'signup').mockResolvedValue(result);
-      expect(
-        await authController.signup({
-          username: 'testuser',
-          email: 'testuser@test.com',
-          password: 'testpass',
-        }),
-      ).toBe(result);
+      const token = 'testToken';
+      const res = {
+        cookie: jest.fn(),
+        send: jest.fn(),
+      } as any;
+
+      jest.spyOn(authService, 'signup').mockResolvedValue({ token });
+
+      await authController.signup(signupDto, res);
+
+      expect(authService.signup).toHaveBeenCalledWith(signupDto);
+      expect(res.cookie).toHaveBeenCalledWith('jwt', token, expect.any(Object));
+      expect(res.send).toHaveBeenCalledWith({ message: 'Signup successful' });
     });
   });
 
   describe('signin', () => {
-    it('should call AuthService.login with correct parameters', async () => {
-      const signinDto: SigninDto = {
-        username: 'testuser',
-        password: 'testpass',
-      };
-      await authController.signin(signinDto);
-      expect(authService.login).toHaveBeenCalledWith(signinDto);
-    });
+    it('should signin a user and set a cookie', async () => {
+      const signinDto: SigninDto = { username: 'test', password: 'test' };
+      const token = 'testToken';
+      const res = {
+        cookie: jest.fn(),
+        send: jest.fn(),
+      } as any;
 
-    it('should return the result of AuthService.login', async () => {
-      const result = { access_token: 'token' };
-      jest.spyOn(authService, 'login').mockResolvedValue(result);
-      expect(
-        await authController.signin({
-          username: 'testuser',
-          password: 'testpass',
-        }),
-      ).toBe(result);
+      jest.spyOn(authService, 'login').mockResolvedValue({ token });
+
+      await authController.signin(signinDto, res);
+
+      expect(authService.login).toHaveBeenCalledWith(signinDto);
+      expect(res.cookie).toHaveBeenCalledWith('jwt', token, expect.any(Object));
+      expect(res.send).toHaveBeenCalledWith({ message: 'Login successful' });
+    });
+  });
+
+  describe('logout', () => {
+    it('should logout a user and clear the cookie', async () => {
+      const res = {
+        clearCookie: jest.fn(),
+        send: jest.fn(),
+      } as any;
+
+      await authController.logout(res);
+
+      expect(res.clearCookie).toHaveBeenCalledWith('jwt');
+      expect(res.send).toHaveBeenCalledWith({ message: 'Logout successful' });
     });
   });
 });
